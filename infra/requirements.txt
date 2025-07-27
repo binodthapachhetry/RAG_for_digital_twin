@@ -1,0 +1,5 @@
+aws-cdk-lib==2.203.1
+constructs==10.4.2
+aws-cdk.aws-lambda-python-alpha==2.200.2a0
+aws-cdk.aws-apigatewayv2-alpha==2.114.1a0
+aws-cdk.aws-apigatewayv2-integrations-alpha==2.114.1a0

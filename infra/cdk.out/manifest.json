@@ -1,0 +1,126 @@
+{
+  "version": "44.0.0",
+  "artifacts": {
+    "ApiStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "ApiStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "ApiStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "ApiStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d9a674e431bdb6f4e47cfd27a60e0515cd077afb7165851b01e239e3a5626ea.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "ApiStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "ApiStack.assets"
+      ],
+      "metadata": {
+        "/ApiStack/TimeseriesAgent/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TimeseriesAgentServiceRole68179EAC"
+          }
+        ],
+        "/ApiStack/TimeseriesAgent/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TimeseriesAgentServiceRoleDefaultPolicy55826089"
+          }
+        ],
+        "/ApiStack/TimeseriesAgent/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TimeseriesAgent22CA1236"
+          }
+        ],
+        "/ApiStack/PublicAPI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PublicAPIF360F3C5"
+          }
+        ],
+        "/ApiStack/PublicAPI/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PublicAPIDefaultStageB793C58C"
+          }
+        ],
+        "/ApiStack/PublicAPI/POST--query/Hook/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PublicAPIPOSTqueryHookDA5F2356"
+          }
+        ],
+        "/ApiStack/PublicAPI/POST--query/Hook-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PublicAPIPOSTqueryHookPermissionE81FB7F4"
+          }
+        ],
+        "/ApiStack/PublicAPI/POST--query/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PublicAPIPOSTquery2922E311"
+          }
+        ],
+        "/ApiStack/ApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiUrl"
+          }
+        ],
+        "/ApiStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/ApiStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/ApiStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/ApiStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "ApiStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  },
+  "minimumCliVersion": "2.1020.0"
+}

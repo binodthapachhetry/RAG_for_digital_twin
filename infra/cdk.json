@@ -1,0 +1,6 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "MODEL_ID": "us.deepseek.r1-v1:0"
+  }
+}

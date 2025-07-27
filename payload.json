@@ -1,0 +1,31 @@
+{
+  "prompt": "What do you think of my glucose level? what should i do to improve it?",
+  "timeseries": {
+    "glucose": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 112 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 118 }
+    ],
+    "weight": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 181.4 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 181.1 }
+    ],
+    "systolic": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 124 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 120 }
+    ],
+    "diastolic": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 78 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 76 }
+    ],
+    "steps": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 6543 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 8123 }
+    ],
+    "sleep": [
+      { "timestamp": "2025-07-22T08:00:00Z", "value": 6.3 },
+      { "timestamp": "2025-07-23T08:00:00Z", "value": 7.1 }
+    ]
+  }
+}
+
+

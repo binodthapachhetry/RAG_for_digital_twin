@@ -1,0 +1,34 @@
+{
+  "version": "44.0.0",
+  "files": {
+    "c9ebc20dc4a06b145edcc3ce6fbb36fb09875421eda896b430ccaaa4438839b9": {
+      "displayName": "TimeseriesAgent/Code",
+      "source": {
+        "path": "asset.c9ebc20dc4a06b145edcc3ce6fbb36fb09875421eda896b430ccaaa4438839b9",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "c9ebc20dc4a06b145edcc3ce6fbb36fb09875421eda896b430ccaaa4438839b9.zip",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "1d9a674e431bdb6f4e47cfd27a60e0515cd077afb7165851b01e239e3a5626ea": {
+      "displayName": "ApiStack Template",
+      "source": {
+        "path": "ApiStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "1d9a674e431bdb6f4e47cfd27a60e0515cd077afb7165851b01e239e3a5626ea.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
