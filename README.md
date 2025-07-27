@@ -1,63 +1,50 @@
-[![CI](https://github.com/<org>/<repo>/actions/workflows/ci.yml/badge.svg)]
-[![codecov](https://codecov.io/gh/<org>/<repo>/branch/main/graph/badge.svg)]
+Suggested prerequisite / setup steps (atomic actions) before coding a real retrieve_reference_material function:              
 
-# Time-Series ➜ LLM API
+  1 Scope & source definition                                                                                                 
+    • Identify the knowledge domains to search (clinical guidelines, nutrition tips, user-specific docs, etc.).               
+    • Decide file formats (Markdown, PDF, HTML, JSON) and update cadence.                                                     
+  2 Chunking & pre-processing pipeline                                                                                        
+    • Write a batch script that:                                                                                              
+    – loads raw documents,                                                                                                    
+    – converts to plain text,                                                                                                 
+    – segments into overlap-aware chunks (e.g., 500–1 000 chars),                                                             
+    – buckets metadata (title, URL, date).                                                                                    
+    • Store results in an S3 staging bucket (or local folder for PoC).                                                        
+  3 Embedding model selection                                                                                                 
+    • Pick a Bedrock embedding model (e.g., amazon.titan-embed-text-v1) or open-source alternative.                           
+    • Benchmark on a small corpus; confirm vector dimensionality and latency.                                                 
+  4 Vector store provisioning                                                                                                 
+    • Choose service (OpenSearch, Pinecone, Milvus, pgvector, etc.).                                                          
+    • Create index/collection with matching vector dimension + metadata fields.                                               
+    • Configure retention, replication, and encryption.                                                                       
+  5 Index build job                                                                                                           
+    • For each chunk: call embedding model, upsert {id, vector, metadata} into the store.                                     
+    • Automate with a one-off script and schedule (e.g., weekly AWS Batch or Step Functions).                                 
+  6 IAM & network wiring                                                                                                      
+    • Grant Lambda permission to call Bedrock embeddings and query the vector store.                                          
+    • OpenSearch: add VPC endpoint or public ACL + SigV4 auth.                                                                
+    • Pinecone: store API key in AWS Secrets Manager.                                                                         
+  7 Runtime retrieval logic (inside Lambda)                                                                                   
+    • Embed the concatenation of userQ + optionally vitals_context.                                                           
+    • Perform top-k similarity search (k≈3-5) with score threshold.                                                           
+    • Post-process: rank/merge, truncate to token budget, strip PII.                                                          
+  8 Environmental configuration                                                                                               
+    • Add env vars: VECTOR_STORE_ENDPOINT, VECTOR_STORE_API_KEY, EMBED_MODEL_ID, RAG_TOP_K, etc.                              
+    • Update CDK stack to inject secrets.                                                                                     
+  9 Observability & fallback                                                                                                  
+    • CloudWatch metrics: retrieval latency, hit/miss ratio, avg similarity score.                                            
+    • If retrieval fails, return empty string so LLM can still answer (current behaviour).                                    
+ 10 Validation assets                                                                                                         
+    • Unit tests: mock vector store, assert deterministic top-k IDs.                                                          
+    • Integration tests: end-to-end Lambda invocation with seeded corpus.                                                     
+    • Load test: ensure <250 ms P95 retrieval to stay within Lambda budget.                                                   
+ 11 Security & compliance                                                                                                     
+    • Scan knowledge base for PHI; tag chunks with sensitivity level.                                                         
+    • Enable encryption at rest + in transit.                                                                                 
+    • Document data lineage for audit.                                                                                        
+ 12 Documentation & run-book                                                                                                  
+    • README for index build, env setup, failure recovery.                                                                    
+    • Architecture diagram showing flow: S3 → Batch → Embeddings → Vector DB → Lambda.                                        
 
-## 1. What the Service Does
-
-A serverless API that accepts raw multivariate time-series health data plus a user question and returns a context-aware answer generated by an Amazon Bedrock LLM.  
-The Lambda no longer performs server–side descriptive statistics; instead, the raw vitals JSON is passed directly to the model which computes any required aggregates on-the-fly.  
-Timestream has been **temporarily disabled** – all vitals must be supplied by the caller.
-
-## 2. High-Level Architecture
-
-The system is built on AWS CDK, deploying an API Gateway, Lambda, Timestream, and Bedrock integration. Lambda functions validate and summarize incoming data, query Timestream if needed, and invoke Bedrock for LLM inference. All infrastructure is managed as code for reproducibility and scale. See the architecture diagram below and in [docs/architecture.mmd](docs/architecture.mmd):
-
-```mermaid
-graph TD
-    User -->|POST /query| APIGateway
-    APIGateway --> Lambda
-    Lambda -->|InvokeModel| Bedrock
-    Bedrock --> Lambda
-    Lambda -->|JSON answer| APIGateway
-    APIGateway --> User
-```
-
-## 3. Data & Control Flow
-
-1. User sends HTTP POST to `/query` with prompt and (optionally) timeseries data.
-2. API Gateway routes request to Lambda.
-3. Lambda validates input and builds a compact raw-JSON context containing the vitals.
-4. Lambda invokes Bedrock LLM, which performs any statistical reasoning required.
-5. Bedrock returns answer; Lambda formats and returns JSON response to user.
-
-## 4. Design Decisions & Rationale
-
-- **Serverless**: Minimizes operational overhead and scales to demand; pay-per-use.
-- **CDK Infrastructure-as-Code**: Ensures reproducible, auditable deployments.
-- **Amazon Bedrock**: Chosen for secure, managed LLM inference with clinical compliance.
-- **Defensive Token Budgeting**: Truncates context to avoid runaway costs and latency.
-- **Raw-Data Delegation**: Descriptive statistics are shifted to the LLM, reducing Lambda logic and token usage.
-- **Timestream Disabled**: Prototype currently avoids AWS persistence for faster iteration and lower cost; can be re-enabled behind the `USE_TIMESTREAM` flag.
-- **Stateless API**: No user data is persisted server-side while Timestream is disabled.
-- **IAM Policy**: Lambda permissions are broad for prototype; will be tightened for least-privilege.
-
-## 5. Operational Characteristics
-
-- **Latency Targets**: dominated by Bedrock inference (<9 s p95).
-- **Cost Drivers**: Bedrock invocations and Lambda duration (no database reads).
-- **IAM Blast Radius**: Current wildcard permissions; to be scoped to resource ARNs.
-- **Observability**: Plans for structured logging and metrics (see TECH_DEBT).
-
-## 6. CI/CD & Quality Gates
-
-- **Deploy Workflow**: On push to main, deploys via GitHub Actions and AWS CDK.
-- **Test & Coverage Workflow**: Separate CI runs pytest with coverage, uploads to Codecov.
-- **Badges**: Build and coverage status shown above, powered by GitHub Actions and Codecov.
-- **Quality Gates**: PRs require passing tests and coverage thresholds.
-
-## 7. Artefacts & Further Docs
-
-- [docs/architecture.mmd](docs/architecture.mmd) – System architecture diagram (Mermaid)
-- [docs/dependency-graph.mmd](docs/dependency-graph.mmd) – Code dependency graph
-- [docs/TECH_DEBT.md](docs/TECH_DEBT.md) – Technical debt registry
+Once the above pieces are in place, implementing retrieve_reference_material becomes a small wrapper: embed query → vector    
+search → assemble passages → token-trim.   
