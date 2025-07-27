@@ -1,0 +1,32 @@
+name: deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  cdk:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # OIDC federation
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install deps
+        run: |
+          pip install -r requirements.lock
+          pip install -r infra/requirements.txt
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CDK_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: CDK synth & deploy
+        run: |
+          npm i -g aws-cdk
+          pip install -r infra/requirements.txt
+          pip install -r src/requirements.txt
+
+          cdk bootstrap   # first run only
+          cdk deploy --require-approval never --all
