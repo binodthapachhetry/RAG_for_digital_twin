@@ -9,17 +9,33 @@ import utils
  # implemented here, but the handler is structured to allow easy                                                                                          
  # insertion of retrieved passages into the LLM context.                                                                                                  
                                                                                                                                                           
-def retrieve_reference_material(userQ: str, vitals_context: str) -> str:                                                                                 
-    """                                                                                                                                                  
-    Retrieve top-N relevant knowledge base passages for the given query.                                                                                 
-    This is a stub. In production, this would:                                                                                                           
-    - Embed the query (userQ or userQ+vitals_context)                                                                                                  
-    - Query a vector DB (e.g., OpenSearch, Pinecone, etc.)                                                                                             
-    - Return concatenated top-k passages (token-trimmed)                                                                                               
-    """                                                                                                                                                  
-    # Example: return empty string or a static passage for now.                                                                                          
-    # Replace with real retrieval logic.                                                                                                                 
-    return ""  
+def retrieve_reference_material(userQ: str, vitals_context: str) -> str:
+    """
+    Retrieve top-N relevant knowledge base passages for the given query.
+
+    Prerequisite setup steps (to be completed before implementing this function):
+    1. Define knowledge domains and document sources (e.g., clinical guidelines, nutrition, user docs).
+    2. Build a chunking & pre-processing pipeline to segment and store documents as plain text chunks with metadata.
+    3. Select and benchmark an embedding model (e.g., Bedrock's amazon.titan-embed-text-v1).
+    4. Provision a vector store (OpenSearch, Pinecone, etc.) with matching vector dimension and metadata fields.
+    5. Implement an index build job to embed and upsert all chunks into the vector store.
+    6. Configure IAM/network so Lambda can call embedding and vector store APIs.
+    7. Add environment variables for endpoints, API keys, embedding model ID, and retrieval parameters.
+    8. Add observability (CloudWatch metrics) and fallback logic (return "" on failure).
+    9. Write validation assets: unit/integration/load tests.
+    10. Ensure security/compliance: PHI scan, encryption, audit trail.
+    11. Document the pipeline and provide a run-book.
+
+    Once the above are in place, this function should:
+    - Embed the concatenation of userQ (+ optionally vitals_context)
+    - Query the vector store for top-k similar passages
+    - Post-process: rank, merge, truncate to token budget, strip PII
+    - Return the concatenated passages as a string
+
+    For now, this is a stub.
+    """
+    # TODO: Implement retrieval logic after prerequisites are complete.
+    return ""
 
 # Bedrock is still required
 bedrock = boto3.client("bedrock-runtime")
