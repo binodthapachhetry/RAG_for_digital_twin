@@ -1,5 +1,4 @@
 name: deploy
-
 on:
   push:
     branches: [ main ]
@@ -7,25 +6,29 @@ on:
 jobs:
   cdk:
     runs-on: ubuntu-latest
+    environment: dev
     permissions:
-      id-token: write   # OIDC federation
       contents: read
+    defaults:
+      run:
+        working-directory: infra
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - name: Install deps
-        run: |
-          pip install -r infra/requirements.txt
+        with: { python-version: '3.11' }
+      - run: |
+          pip install -r requirements.txt
+          pip install -r ../src/requirements.txt
       - uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_CDK_ROLE_ARN }}
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: CDK synth & deploy
-        run: |
-          npm i -g aws-cdk
-          pip install -r infra/requirements.txt
-          pip install -r src/requirements.txt
+      - run: aws sts get-caller-identity
+      - run: npm i -g aws-cdk
+      - run: cdk bootstrap || true
+      - run: cdk synth
+      - run: cdk deploy --require-approval never --all
 
-          cdk bootstrap   # first run only
-          cdk deploy --require-approval never --all
