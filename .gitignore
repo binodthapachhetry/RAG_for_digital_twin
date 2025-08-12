@@ -1,1 +1,4 @@
 .aider*
+infra/cdk.out/
+src/__pycache__/
+.DS_Store

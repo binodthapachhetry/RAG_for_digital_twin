@@ -1,5 +1,5 @@
 {
-  "prompt": "What do you think of my glucose level? what should i do to improve it?",
+  "prompt": "What is my name? What do you think of my glucose level?",
   "timeseries": {
     "glucose": [
       { "timestamp": "2025-07-22T08:00:00Z", "value": 112 },
@@ -25,7 +25,17 @@
       { "timestamp": "2025-07-22T08:00:00Z", "value": 6.3 },
       { "timestamp": "2025-07-23T08:00:00Z", "value": 7.1 }
     ]
-  }
+  },
+  "history": [
+      {
+        "role": "user",
+        "content": "Hi, My name is Binod. How are you?"
+      },
+      {
+        "role": "assistant",
+        "content": "Hi, Binod. Not much. Just patiently waiting for your inquiry."
+      }
+    ]
 }
 
 

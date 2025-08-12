@@ -1,5 +1,18 @@
-import json, os, boto3
-import utils
+import json, logging, uuid, time, os
+from typing import Dict, List
+import boto3
+import utils                           # ← your helpers
+from utils import validate_payload, build_context_from_payload, prepare_history_for_llm
+
+
+# # --- Local testing bypass ---
+# if os.getenv("LOCAL_TEST") == "1":
+#     def handler(event, _):
+#         return {
+#             "statusCode": 200,
+#             "headers": {"Content-Type": "application/json"},
+#             "body": json.dumps({"answer": "[LOCAL MOCK] I parsed your timeseries and history just fine."})
+#         }
 
  # ------------------------------------------------------------------ #                                                                                   
  #  RAG (Retrieval-Augmented Generation) Extension - Conceptual Stub  #                                                                                   
@@ -49,16 +62,15 @@ bedrock = boto3.client("bedrock-runtime")
 # unless that span is represented in the provided data.
 # If data is missing, explicitly say so.
 # ------------------------------------------------------------------ #
+
 SYSTEM_PROMPT = (
-    "You are a helpful life-coach / clinical assistant.\n"
-    "You will receive the patient’s raw vitals data in JSON format, "
-    "contained in the assistant message named 'vitals'. Each key maps to "
-    "an array of numeric values recorded chronologically.\n\n"
-    "When answering the user, you may compute averages, trends, or other "
-    "descriptive statistics **on-the-fly** as needed, but base every "
-    "statement strictly on that supplied data set. If data for a metric "
-    "or period is missing, state so explicitly. Keep responses concise, "
-    "clear, and grounded in the provided numbers."
+    "You are a proactive life-coach / clinical assistant.\n\n"
+    "You will see:\n"
+    "• assistant/vitals – JSON of raw time-series vitals (glucose, weight, bp_sys, bp_dia), newest last.\n"
+    "• optional assistant/reference_material – evidence snippets.\n"
+    "• user/assistant message history – prior dialogue to maintain continuity.\n\n"
+    "Ground your reply in the vitals and prior history; compute simple stats on the fly; "
+    "state missing data explicitly; be concise, supportive, and numerically precise."
 )
 
 # ── TEMPORARILY DISABLE AWS TIMESTREAM ────────────────────────────────
@@ -77,87 +89,172 @@ def fetch_latest(series: str, hours: int = 168):  # pylint: disable=unused-argum
     """Timestream access disabled: return no data."""
     return []
 
+# ---------- structured logger -----------------------------------------------
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
-def handler(event, _):                                                                                                                                   
-    try:                                                                                                                                                 
-        payload = json.loads(event.get("body", "{}"))                                                                                                    
-        userQ, ts_in = utils.validate_payload(payload)                                                                                                   
-    except ValueError as err:                                                                                                                            
-        return {                                                                                                                                         
-            "statusCode": 400,                                                                                                                           
-            "headers": {"Content-Type": "application/json"},                                                                                             
-            "body": json.dumps({"error": str(err)})                                                                                                      
-        }                                                                                                                                                
-                                                                                                                                                        
-    ts_dict = {                                                                                                                                          
-        "glucose": ts_in.get("glucose") or fetch_latest("glucose"),                                                                                      
-        "weight" : ts_in.get("weight")  or fetch_latest("weight"),                                                                                       
-        "bp_sys" : ts_in.get("bp_sys")  or fetch_latest("bp_sys"),                                                                                       
-        "bp_dia" : ts_in.get("bp_dia")  or fetch_latest("bp_dia"),                                                                                       
-    }                                                                                                                                                    
-                                                                                                                                                        
-    context = utils.build_context_from_payload(userQ, ts_dict)                                                                                           
-                                                                                                                                                        
-    # --- RAG: Retrieve reference material (stubbed) ---                                                                                                 
-    reference_material = retrieve_reference_material(userQ, context)                                                                                     
-    messages = [                                                                                                                                         
-        {"role": "system", "content": SYSTEM_PROMPT},                                                                                                    
-        {"role": "assistant", "name": "vitals", "content": context},                                                                                     
-    ]                                                                                                                                                    
-    if reference_material:                                                                                                                               
-        messages.append(                                                                                                                                 
-            {"role": "assistant", "name": "reference_material", "content": reference_material}                                                           
-        )                                                                                                                                                
-    messages.append({"role": "user", "content": userQ})                                                                                                  
-                                                                                                                                                        
-    payload = {                                                                                                                                          
-        "messages": messages,                                                                                                                            
-        "max_tokens": 2000,                                                                                                                              
-    }                                                                                                                                                    
-    if not MODEL_ID:                     # extra runtime safety                                                                                          
-        return {                                                                                                                                         
-            "statusCode": 500,                                                                                                                           
-            "headers": {"Content-Type": "application/json"},                                                                                             
-            "body": json.dumps({"error": "MODEL_ID not configured on Lambda"})                                                                           
-        }                                                                                                                                                
-                                                                                                                                                        
-    # -----------------------------------------------------------------                                                                                  
-    # Invoke Bedrock and robustly extract the assistant’s reply.                                                                                         
-    # Different foundation models return slightly different response                                                                                     
-    # shapes, so we fall-back through several possibilities instead of                                                                                   
-    # assuming a top-level “content” key.                                                                                                                
-    # -----------------------------------------------------------------                                                                                  
-    resp = bedrock.invoke_model(                                                                                                                         
-        modelId=MODEL_ID,                                                                                                                                
-        body=json.dumps(payload).encode(),                                                                                                               
-    )                                                                                                                                                    
-                                                                                                                                                        
-    raw_body = resp["body"].read()                                                                                                                       
-                                                                                                                                                        
-    try:                                                                                                                                                 
-        body_json = json.loads(raw_body)                                                                                                                 
-    except json.JSONDecodeError:                                                                                                                         
-        # Model returned plain text – use it directly.                                                                                                   
-        answer = raw_body.decode("utf-8", errors="ignore")                                                                                               
-    else:                                                                                                                                                
-        # Common patterns across Bedrock providers                                                                                                       
-        answer = (                                                                                                                                       
-            body_json.get("content")                                  # Claude/Anthropic                                                                 
-            or (body_json.get("message") or {}).get("content")        # Meta/DeepSeek “message”                                                          
-            or (                                                                                                                                         
-                body_json.get("choices", [{}])[0]                     # OpenAI-style                                                                     
-                .get("message", {})                                                                                                                      
-                .get("content")                                                                                                                          
-                if body_json.get("choices") else None                                                                                                    
-            )                                                                                                                                            
-            or body_json.get("results", [{}])[0].get("outputText")    # AI21-style                                                                       
-        )                                                                                                                                                
-                                                                                                                                                        
-        if answer is None:  # final fallback – return entire JSON                                                                                        
-            answer = json.dumps(body_json)                                                                                                               
-                                                                                                                                                        
-    return {                                                                                                                                             
-        "statusCode": 200,                                                                                                                               
-        "headers": {"Content-Type": "application/json; charset=utf-8"},                                                                                  
-        "body": json.dumps({"answer": answer}, ensure_ascii=False),                                                                                      
-    }  
+
+def handler(event, _):
+    req_id   = str(uuid.uuid4())
+    t0       = time.time()
+
+    try:
+        incoming = json.loads(event.get("body", "{}"))
+        userQ, ts_in, history_in = validate_payload(incoming)
+    except ValueError as err:
+        return _resp(400, {"error": str(err)})
+
+    ts_dict = {
+        "glucose": ts_in.get("glucose") or fetch_latest("glucose"),
+        "weight" : ts_in.get("weight")  or fetch_latest("weight"),
+        "bp_sys" : ts_in.get("bp_sys")  or fetch_latest("bp_sys"),
+        "bp_dia" : ts_in.get("bp_dia")  or fetch_latest("bp_dia"),
+    }
+
+    context_json = build_context_from_payload(userQ, ts_dict)
+    ref_mat = retrieve_reference_material(userQ, context_json)
+
+    # --- assemble messages ---
+    messages: List[Dict] = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "assistant", "name": "vitals", "content": context_json},
+    ]
+    if ref_mat:
+        messages.append({"role": "assistant", "name": "reference_material", "content": ref_mat})
+
+    # add trimmed/sanitized history BEFORE latest user question
+    messages.extend(prepare_history_for_llm(history_in))
+
+    messages.append({"role": "user", "content": userQ})
+
+    if not MODEL_ID:
+        return _resp(500, {"error": "MODEL_ID not configured on Lambda"})
+
+    brq = {"messages": messages, "max_tokens": 2000}
+
+    t1 = time.time()
+    resp = bedrock.invoke_model(modelId=MODEL_ID, body=json.dumps(brq).encode())
+    latency_ms = int((time.time() - t1) * 1000)
+
+    # Prefer Bedrock's request id if present
+    bedrock_req_id = (
+        resp.get("ResponseMetadata", {}).get("RequestId")
+        or resp.get("ResponseMetadata", {}).get("RequestID")
+        or req_id
+    )
+
+    raw = resp["body"].read()
+
+    answer, model_version, token_usage = _extract_answer_and_metadata(raw)
+
+    logger.info(json.dumps({
+        "req_id": bedrock_req_id,
+        "model_id": MODEL_ID,
+        "model_version": model_version,
+        "token_usage": token_usage,
+        "latency_ms": latency_ms,
+        "has_glucose": bool(ts_dict.get("glucose")),
+        "has_weight":  bool(ts_dict.get("weight")),
+        "has_bp":      bool(ts_dict.get("bp_sys")) and bool(ts_dict.get("bp_dia")),
+    }))
+
+    return _resp(200, {
+        "answer": answer,
+        "model_id": MODEL_ID,
+        "model_version": model_version,
+        "token_usage": token_usage,
+        "latency_ms": latency_ms,
+        "request_id": bedrock_req_id,
+    })
+
+
+# ───────────────────────────────── helpers ───────────────────────────────────
+def _extract_answer_and_metadata(body_bytes: bytes):
+    """
+    Best-effort extraction across Bedrock providers.
+    Returns: (answer: str, model_version: Optional[str], token_usage: Optional[dict])
+    """
+    # defaults
+    answer = None
+    model_version = None
+    token_usage = None
+
+    # Try JSON first; fall back to plain text
+    try:
+        body = json.loads(body_bytes)
+    except json.JSONDecodeError:
+        return body_bytes.decode("utf-8", errors="ignore"), None, None
+
+    # ----- answer (multiple common shapes) -----
+    answer = (
+        body.get("content")  # Anthropic-like
+        or (body.get("message") or {}).get("content")  # Meta/DeepSeek-like
+        or (
+            body.get("choices", [{}])[0].get("message", {}).get("content")
+            if body.get("choices") else None
+        )  # OpenAI-like
+        or body.get("results", [{}])[0].get("outputText")  # AI21-like
+        or body.get("outputText")  # some Titan responses
+    )
+
+    # ----- model version (check several places) -----
+    model_version = (
+        body.get("modelVersion")
+        or body.get("version")
+        or (body.get("meta") or {}).get("model_version")
+        or (body.get("message") or {}).get("model_version")
+        or (body.get("model") if isinstance(body.get("model"), str) else None)
+    )
+
+    # ----- usage normalization -----
+    # Common locations: top-level usage, meta.usage, message.usage, choices[0].usage
+    raw_usage = (
+        body.get("usage")
+        or (body.get("meta") or {}).get("usage")
+        or (body.get("message") or {}).get("usage")
+        or (body.get("choices", [{}])[0].get("usage") if body.get("choices") else None)
+    )
+    if isinstance(raw_usage, dict):
+        token_usage = {
+            "input_tokens": (
+                raw_usage.get("input_tokens")
+                or raw_usage.get("prompt_tokens")
+                or raw_usage.get("inputTokens")
+                or raw_usage.get("promptTokens")
+            ),
+            "output_tokens": (
+                raw_usage.get("output_tokens")
+                or raw_usage.get("completion_tokens")
+                or raw_usage.get("outputTokens")
+                or raw_usage.get("completionTokens")
+            ),
+            "total_tokens": (
+                raw_usage.get("total_tokens")
+                or raw_usage.get("totalTokens")
+            ),
+        }
+        # Compute total if provider didn’t supply it but parts exist
+        if token_usage["total_tokens"] is None:
+            it = token_usage["input_tokens"] or 0
+            ot = token_usage["output_tokens"] or 0
+            total = it + ot
+            token_usage["total_tokens"] = total if (it or ot) else None
+
+        # If all None, treat as absent
+        if not any(v is not None for v in token_usage.values()):
+            token_usage = None
+
+    # Final fallback: return JSON if we couldn't find a content field
+    if answer is None:
+        answer = json.dumps(body)
+
+    return answer, model_version, token_usage
+
+
+
+def _resp(status: int, body: Dict):
+    return {
+        "statusCode": status,
+        "headers": {"Content-Type": "application/json; charset=utf-8"},
+        "body": json.dumps(body, ensure_ascii=False),
+    }
