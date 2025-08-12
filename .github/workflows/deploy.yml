@@ -16,7 +16,6 @@ jobs:
         with: { python-version: "3.11" }
       - name: Install deps
         run: |
-          pip install -r requirements.lock
           pip install -r infra/requirements.txt
       - uses: aws-actions/configure-aws-credentials@v4
         with:
