@@ -3,7 +3,7 @@ from typing import Dict, List
 import boto3
 import utils                           # ← your helpers
 from utils import validate_payload, build_context_from_payload, prepare_history_for_llm
-
+from prompts import SYSTEM_PROMPT
 
 # # --- Local testing bypass ---
 # if os.getenv("LOCAL_TEST") == "1":
@@ -63,15 +63,7 @@ bedrock = boto3.client("bedrock-runtime")
 # If data is missing, explicitly say so.
 # ------------------------------------------------------------------ #
 
-SYSTEM_PROMPT = (
-    "You are a proactive life-coach / clinical assistant.\n\n"
-    "You will see:\n"
-    "• assistant/vitals – JSON of raw time-series vitals (glucose, weight, bp_sys, bp_dia), newest last.\n"
-    "• optional assistant/reference_material – evidence snippets.\n"
-    "• user/assistant message history – prior dialogue to maintain continuity.\n\n"
-    "Ground your reply in the vitals and prior history; compute simple stats on the fly; "
-    "state missing data explicitly; be concise, supportive, and numerically precise."
-)
+system_prompt = SYSTEM_PROMPT
 
 # ── TEMPORARILY DISABLE AWS TIMESTREAM ────────────────────────────────
 # Replace the Timestream client with a stub that always returns an
@@ -105,22 +97,24 @@ def handler(event, _):
         return _resp(400, {"error": str(err)})
 
     ts_dict = {
-        "glucose": ts_in.get("glucose") or fetch_latest("glucose"),
-        "weight" : ts_in.get("weight")  or fetch_latest("weight"),
-        "bp_sys" : ts_in.get("bp_sys")  or fetch_latest("bp_sys"),
-        "bp_dia" : ts_in.get("bp_dia")  or fetch_latest("bp_dia"),
-    }
+    "health_age": ts_in.get("health_age") or fetch_latest("health_age"),  
+    "glucose": ts_in.get("glucose") or fetch_latest("glucose"),
+    "weight" : ts_in.get("weight")  or fetch_latest("weight"),
+    "bp_sys" : ts_in.get("bp_sys")  or fetch_latest("bp_sys"),
+    "bp_dia" : ts_in.get("bp_dia")  or fetch_latest("bp_dia"),
+    "bmi"    : ts_in.get("bmi")     or fetch_latest("bmi"),   # optional
+    "rhr"    : ts_in.get("rhr")     or fetch_latest("rhr"),   # optional
+}
 
-    context_json = build_context_from_payload(userQ, ts_dict)
-    ref_mat = retrieve_reference_material(userQ, context_json)
+    context = build_context_from_payload(ts_dict)
 
     # --- assemble messages ---
     messages: List[Dict] = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "assistant", "name": "vitals", "content": context_json},
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"{userQ}\n\nContext data:\n{context}"},
     ]
-    if ref_mat:
-        messages.append({"role": "assistant", "name": "reference_material", "content": ref_mat})
+    # if ref_mat:
+    #     messages.append({"role": "assistant", "name": "reference_material", "content": ref_mat})
 
     # add trimmed/sanitized history BEFORE latest user question
     messages.extend(prepare_history_for_llm(history_in))

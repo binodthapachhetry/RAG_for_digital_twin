@@ -1,41 +1,877 @@
 {
-  "prompt": "What is my name? What do you think of my glucose level?",
-  "timeseries": {
-    "glucose": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 112 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 118 }
-    ],
-    "weight": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 181.4 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 181.1 }
-    ],
-    "systolic": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 124 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 120 }
-    ],
-    "diastolic": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 78 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 76 }
-    ],
-    "steps": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 6543 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 8123 }
-    ],
-    "sleep": [
-      { "timestamp": "2025-07-22T08:00:00Z", "value": 6.3 },
-      { "timestamp": "2025-07-23T08:00:00Z", "value": 7.1 }
-    ]
+  "user_id": "user-12345-demo",
+  "program": {
+    "baseline_date": "2025-06-23",
+    "current_week_index": 10,
+    "forecast_horizon_weeks": 25
   },
+  "prompt": "What do you think of my glucose level? What micro-actions should I take this week?",
   "history": [
-      {
-        "role": "user",
-        "content": "Hi, My name is Binod. How are you?"
-      },
-      {
-        "role": "assistant",
-        "content": "Hi, Binod. Not much. Just patiently waiting for your inquiry."
+    {
+      "role": "user",
+      "content": "Hi, My name is Binod. How are you?"
+    },
+    {
+      "role": "assistant",
+      "content": "Hi, Binod. Not much. Just patiently waiting for your inquiry."
+    }
+  ],
+  "weekly_timepoints": [
+    {
+      "week_index": 0,
+      "date_start": "2025-06-23",
+      "date_end": "2025-06-29",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 54.2,
+          "pred": 54.2,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 118.0,
+          "pred": 118.0,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 132.0,
+          "pred": 132.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 85.0,
+          "pred": 85.0,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.4,
+          "pred": 29.4,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 76.0,
+          "pred": 76.0,
+          "unit": "bpm"
+        }
       }
-    ]
+    },
+    {
+      "week_index": 1,
+      "date_start": "2025-06-30",
+      "date_end": "2025-07-06",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 54.1,
+          "pred": 54.1,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 118.2,
+          "pred": 117.4,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 132.6,
+          "pred": 131.6,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 85.2,
+          "pred": 84.7,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.4,
+          "pred": 29.3,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 76.2,
+          "pred": 75.7,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 2,
+      "date_start": "2025-07-07",
+      "date_end": "2025-07-13",
+      "notes_ppi": "Travel week; late dinners x2; higher-sodium meals.",
+      "metrics": {
+        "health_age": {
+          "actual": 54.0,
+          "pred": 53.9,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 118.3,
+          "pred": 116.7,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 133.2,
+          "pred": 131.2,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 85.6,
+          "pred": 84.4,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.5,
+          "pred": 29.3,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 76.2,
+          "pred": 75.4,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 3,
+      "date_start": "2025-07-14",
+      "date_end": "2025-07-20",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 53.8,
+          "pred": 53.8,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 116.6,
+          "pred": 116.1,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 131.6,
+          "pred": 130.8,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 84.6,
+          "pred": 84.0,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.3,
+          "pred": 29.2,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 75.6,
+          "pred": 75.0,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 4,
+      "date_start": "2025-07-21",
+      "date_end": "2025-07-27",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 53.6,
+          "pred": 53.7,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 115.0,
+          "pred": 115.4,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 129.8,
+          "pred": 130.4,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 83.4,
+          "pred": 83.7,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.0,
+          "pred": 29.1,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 74.3,
+          "pred": 74.7,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 5,
+      "date_start": "2025-07-28",
+      "date_end": "2025-08-03",
+      "notes_ppi": "Minor cold; poor sleep for 3 nights.",
+      "metrics": {
+        "health_age": {
+          "actual": 53.8,
+          "pred": 53.6,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 116.8,
+          "pred": 114.8,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 133.0,
+          "pred": 130.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 85.2,
+          "pred": 83.4,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.2,
+          "pred": 29.0,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 75.9,
+          "pred": 74.4,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 6,
+      "date_start": "2025-08-04",
+      "date_end": "2025-08-10",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 53.4,
+          "pred": 53.4,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 114.5,
+          "pred": 114.2,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 130.1,
+          "pred": 129.6,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 83.5,
+          "pred": 83.1,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.0,
+          "pred": 29.0,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 74.4,
+          "pred": 74.1,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 7,
+      "date_start": "2025-08-11",
+      "date_end": "2025-08-17",
+      "notes_ppi": "Great adherence: 15\u201320 min post-dinner walks most days.",
+      "metrics": {
+        "health_age": {
+          "actual": 53.2,
+          "pred": 53.3,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 112.9,
+          "pred": 113.5,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 128.3,
+          "pred": 129.2,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 82.3,
+          "pred": 82.8,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 28.7,
+          "pred": 28.9,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 73.1,
+          "pred": 73.8,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 8,
+      "date_start": "2025-08-18",
+      "date_end": "2025-08-24",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 53.1,
+          "pred": 53.2,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 112.6,
+          "pred": 112.9,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 128.4,
+          "pred": 128.8,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 82.1,
+          "pred": 82.4,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 28.7,
+          "pred": 28.8,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 73.0,
+          "pred": 73.4,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 9,
+      "date_start": "2025-08-25",
+      "date_end": "2025-08-31",
+      "notes_ppi": "Holiday meal; higher sodium; measured later than usual.",
+      "metrics": {
+        "health_age": {
+          "actual": 53.1,
+          "pred": 53.0,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 113.7,
+          "pred": 112.2,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 130.9,
+          "pred": 128.4,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 83.6,
+          "pred": 82.1,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 29.0,
+          "pred": 28.8,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 74.1,
+          "pred": 73.1,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 10,
+      "date_start": "2025-09-01",
+      "date_end": "2025-09-07",
+      "notes_ppi": "",
+      "metrics": {
+        "health_age": {
+          "actual": 52.9,
+          "pred": 52.9,
+          "unit": "years"
+        },
+        "fbg": {
+          "actual": 112.0,
+          "pred": 111.6,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "actual": 128.6,
+          "pred": 128.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "actual": 82.1,
+          "pred": 81.8,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "actual": 28.7,
+          "pred": 28.7,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "actual": 73.0,
+          "pred": 72.8,
+          "unit": "bpm"
+        }
+      }
+    }
+  ],
+  "forecast": [
+    {
+      "week_index": 11,
+      "metrics": {
+        "health_age": {
+          "pred": 52.8,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 111.0,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 127.6,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 81.5,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.6,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 72.5,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 12,
+      "metrics": {
+        "health_age": {
+          "pred": 52.7,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 110.3,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 127.2,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 81.2,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.5,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 72.2,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 13,
+      "metrics": {
+        "health_age": {
+          "pred": 52.5,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 109.7,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 126.8,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 80.8,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.5,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 71.8,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 14,
+      "metrics": {
+        "health_age": {
+          "pred": 52.4,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 109.0,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 126.4,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 80.5,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.4,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 71.5,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 15,
+      "metrics": {
+        "health_age": {
+          "pred": 52.3,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 108.4,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 126.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 80.2,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.3,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 71.2,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 16,
+      "metrics": {
+        "health_age": {
+          "pred": 52.2,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 107.8,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 125.6,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 79.9,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.2,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 70.9,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 17,
+      "metrics": {
+        "health_age": {
+          "pred": 52.0,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 107.1,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 125.2,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 79.6,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.2,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 70.6,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 18,
+      "metrics": {
+        "health_age": {
+          "pred": 51.9,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 106.5,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 124.8,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 79.2,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.1,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 70.2,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 19,
+      "metrics": {
+        "health_age": {
+          "pred": 51.8,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 105.8,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 124.4,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 78.9,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.0,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 69.9,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 20,
+      "metrics": {
+        "health_age": {
+          "pred": 51.6,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 105.2,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 124.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 78.6,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 28.0,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 69.6,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 21,
+      "metrics": {
+        "health_age": {
+          "pred": 51.5,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 104.6,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 123.6,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 78.3,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 27.9,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 69.3,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 22,
+      "metrics": {
+        "health_age": {
+          "pred": 51.4,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 103.9,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 123.2,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 78.0,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 27.8,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 69.0,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 23,
+      "metrics": {
+        "health_age": {
+          "pred": 51.3,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 103.3,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 122.8,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 77.6,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 27.7,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 68.6,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 24,
+      "metrics": {
+        "health_age": {
+          "pred": 51.1,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 102.6,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 122.4,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 77.3,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 27.7,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 68.3,
+          "unit": "bpm"
+        }
+      }
+    },
+    {
+      "week_index": 25,
+      "metrics": {
+        "health_age": {
+          "pred": 51.0,
+          "unit": "years"
+        },
+        "fbg": {
+          "pred": 102.0,
+          "unit": "mg/dL"
+        },
+        "sbp": {
+          "pred": 122.0,
+          "unit": "mmHg"
+        },
+        "dbp": {
+          "pred": 77.0,
+          "unit": "mmHg"
+        },
+        "bmi": {
+          "pred": 27.6,
+          "unit": "kg/m^2"
+        },
+        "rhr": {
+          "pred": 68.0,
+          "unit": "bpm"
+        }
+      }
+    }
+  ]
 }
-
 

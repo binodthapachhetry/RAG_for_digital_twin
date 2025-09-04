@@ -65,7 +65,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "4a515be3437cc59b04f9239dbfc16d20a5dfdb0c48831d258d7fe1451ee23d52.zip"
+     "S3Key": "7b7bd9ab88a1678180e01585fdc0cea2abd7ad6fe32fb842dd0e1862c315aef4.zip"
     },
     "Environment": {
      "Variables": {
@@ -89,7 +89,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "ApiStack/TimeseriesAgent/Resource",
-    "aws:asset:path": "asset.4a515be3437cc59b04f9239dbfc16d20a5dfdb0c48831d258d7fe1451ee23d52",
+    "aws:asset:path": "asset.7b7bd9ab88a1678180e01585fdc0cea2abd7ad6fe32fb842dd0e1862c315aef4",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
