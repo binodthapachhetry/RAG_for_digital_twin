@@ -106,7 +106,7 @@ def handler(event, _):
     "rhr"    : ts_in.get("rhr")     or fetch_latest("rhr"),   # optional
 }
 
-    context = build_context_from_payload(ts_dict)
+    context = build_context_from_payload(userQ, ts_dict)
 
     # --- assemble messages ---
     messages: List[Dict] = [

@@ -1,5 +1,5 @@
 .aider*
-infra/cdk.out/
+infra/cdk.out
 src/__pycache__/
 .DS_Store
 .env
